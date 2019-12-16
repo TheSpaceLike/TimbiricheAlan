@@ -5,17 +5,9 @@
  */
 package SocketCliente;
 
-import Dominio.Cuadro;
-import Dominio.Jugador;
-import Dominio.Linea;
-import Dominio.Marcador;
+
 import Dominio.Posicion;
 import DominioDTO.DTOCuadro;
-import DominioDTO.DTOJugador;
-import DominioDTO.DTOLinea;
-import DominioDTO.DTOMarcador;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -24,6 +16,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import presentacion.inicio.IActualizable;
+import DominioDTO.DTOJugador;
+import DominioDTO.DTOLinea;
+import DominioDTO.DTOMarcador;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import Dominio.Cuadro;
+import Dominio.Jugador;
+import Dominio.Linea;
+import Dominio.Marcador;
+
 
 /**
  *
@@ -78,10 +80,10 @@ public class SocketCliente implements Runnable {
                 objeto = clientInput.readObject();
 
                 if (objeto instanceof List) {
-                    List<DTOJugador> jugadoresDTO = (List<DTOJugador>) objeto;
+                    List<DTOJugador> DTOJugadores = (List<DTOJugador>) objeto;
                     List<Jugador> jugadores = new ArrayList<>();
 
-                    for (DTOJugador jugador : jugadoresDTO) {
+                    for (DTOJugador jugador : DTOJugadores) {
                         jugadores.add(new Jugador(jugador.getNombreJugador(), jugador.getRutaAvatar()));
                     }
 
@@ -90,11 +92,11 @@ public class SocketCliente implements Runnable {
                     String string = (String) objeto;
                     objeto = string;
                 } else if (objeto instanceof DTOMarcador) {
-                    DTOMarcador marcadorDTO = (DTOMarcador) objeto;
-                    List<DTOJugador> jugadoresDTO = marcadorDTO.getJugadores();
+                    DTOMarcador DTOMarcador = (DTOMarcador) objeto;
+                    List<DTOJugador> DTOJugadores = DTOMarcador.getJugadores();
                     List<Jugador> jugadores = new ArrayList<>();
 
-                    for (DTOJugador jugador : jugadoresDTO) {
+                    for (DTOJugador jugador : DTOJugadores) {
                         jugadores.add(new Jugador(jugador.getNombreJugador(), jugador.getRutaAvatar(), jugador.getPuntaje()));
                     }
 
@@ -102,26 +104,26 @@ public class SocketCliente implements Runnable {
 
                     objeto = marcador;
                 } else if (objeto instanceof DTOLinea) {
-                    DTOLinea lineaDTO = (DTOLinea) objeto;
+                    DTOLinea DTOLinea = (DTOLinea) objeto;
 
                     Linea linea = new Linea(
-                            Posicion.valueOf(lineaDTO.getPosicion()),
+                            Posicion.valueOf(DTOLinea.getPosicion()),
                             new Jugador(
-                                    lineaDTO.getJugador().getNombreJugador(),
-                                    lineaDTO.getJugador().getRutaAvatar(),
-                                    lineaDTO.getJugador().getPuntaje()),
-                            lineaDTO.getIndice());
+                                    DTOLinea.getJugador().getNombreJugador(),
+                                    DTOLinea.getJugador().getRutaAvatar(),
+                                    DTOLinea.getJugador().getPuntaje()),
+                            DTOLinea.getIndice());
 
                     objeto = linea;
                 } else if (objeto instanceof DTOCuadro) {
-                    DTOCuadro cuadroDTO = (DTOCuadro) objeto;
+                    DTOCuadro DTOCuadro = (DTOCuadro) objeto;
 
                     Cuadro cuadro = new Cuadro(
                             new Jugador(
-                                    cuadroDTO.getJugador().getNombreJugador(),
-                                    cuadroDTO.getJugador().getRutaAvatar(),
-                                    cuadroDTO.getJugador().getPuntaje()),
-                            cuadroDTO.getIndice());
+                                    DTOCuadro.getJugador().getNombreJugador(),
+                                    DTOCuadro.getJugador().getRutaAvatar(),
+                                    DTOCuadro.getJugador().getPuntaje()),
+                            DTOCuadro.getIndice());
 
                     objeto = cuadro;
                 }
@@ -129,7 +131,7 @@ public class SocketCliente implements Runnable {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        actualizable.actualizaDeSocket(objeto);
+                        actualizable.upDate(objeto);
                     }
                 });
 

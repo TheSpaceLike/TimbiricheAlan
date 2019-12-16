@@ -354,7 +354,7 @@ public class FrmSala extends javax.swing.JFrame implements PnlObservador, IActua
     }
 
     @Override
-    public void actualizaDeSocket(Object mensaje) {
+    public void upDate(Object mensaje) {
         if(mensaje instanceof Marcador){
             Marcador marcador = (Marcador) mensaje;
             actualizarMarcador((Marcador) mensaje);

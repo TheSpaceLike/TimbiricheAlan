@@ -377,7 +377,7 @@ public class SalaEspera extends javax.swing.JFrame implements IActualizable {
     // End of variables declaration//GEN-END:variables
 
     @Override
-    public void actualizaDeSocket(Object mensaje) {
+    public void upDate(Object mensaje) {
         if (mensaje instanceof String) {
             recibirMensaje((String) mensaje);
         } else if (mensaje instanceof List) {

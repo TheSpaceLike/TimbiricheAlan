@@ -25,14 +25,15 @@ import java.util.logging.Logger;
  */
 public class HiloServer implements Runnable {
 
-    private volatile DTOJugador jugadorDTO;
     private ObjectInputStream input;
     private ObjectOutputStream output;
-    private volatile List<HiloServer> threads;
     private ProtocoloInterprete ssp;
     private Socket s;
     private boolean votado;
     private int MAX;
+    private volatile DTOJugador DTOjugador;
+    private volatile List<HiloServer> threads;
+    
 
     public HiloServer(Socket s, List<HiloServer> hilo, int MAX) throws IOException {
         this.s = s;
@@ -47,58 +48,58 @@ public class HiloServer implements Runnable {
 
     @Override
     public void run() {
-        Object MsjEntrante;
+        Object msjNuevo;
 
         while (true) {
             try {
 
-              
-                MsjEntrante = input.readObject();
+              //Aqui se lee la entrada
+                msjNuevo = input.readObject();
 
-               
-                Object MsjSaliendo = ssp.procesarEntrada(MsjEntrante);
+               // El interprete pasa a procesar el mensaje.
+                Object msjLast = ssp.interpretarEntrada(msjNuevo);
 
-              
-                if (MsjSaliendo == MsjSockets.JUGADOR_NUEVO) {
-                    System.out.println("Entro jugador: " + MsjEntrante);
-                    this.jugadorDTO = (DTOJugador) MsjEntrante;
+               //Un cliente nuevo
+                if (msjLast == MsjSockets.NUEVOJUGADOR) {
+                    System.out.println("Entro el jugador: " + msjNuevo);
+                    this.DTOjugador = (DTOJugador) msjNuevo;
 
-                  
+                  //Se crea un lista de clientes.
                     List<DTOJugador> jugadores = new ArrayList<>();
                     for (HiloServer thread : threads) {
                         jugadores.add(thread.getJugadorDTO());
                     }
 
-                
-                    transmitirATodos(jugadores);
+                //Se comunica a todos los clientes para actualizar.
+                    comunicarTodos(jugadores);
 
                     if (threads.size() == MAX) {
-                        Object empezarPartida = ssp.empezarPartida(jugadores);
-                        transmitirATodos(empezarPartida);
+                        Object comenzarPartida = ssp.empezarPartida(jugadores);
+                        comunicarTodos(comenzarPartida);
                     }
 
-                  
-                } else if (MsjSaliendo == MsjSockets.VOTO) {
-                   
+                  //Si voto el cliente
+                } else if (msjLast == MsjSockets.VOTO) {
+                   //No voto el cliente
                     if (this.votado == false) {
                         this.votado = true;
-                        MsjSaliendo = this.jugadorDTO.getNombreJugador() + " votado";
-                        
+                        msjLast = this.DTOjugador.getNombreJugador() + " a votado";
+                    //Si ya habia votado el cliente
                     } else {
                         this.votado = false;
-                        MsjSaliendo = this.jugadorDTO.getNombreJugador() + " Se ha cancelado el voto";
+                        msjLast = this.DTOjugador.getNombreJugador() + " Se cancelo el voto";
                     }
 
-                    
-                    transmitirATodos(MsjSaliendo);
-                } else if (MsjSaliendo instanceof DTOLinea) {
-                    transmitirATodos(MsjSaliendo);
-                } else if (MsjSaliendo instanceof DTOCuadro) {
-                    transmitirATodos(MsjSaliendo);
-                    Object marcador = ssp.procesarEntrada(MsjSockets.MARCADOR);
-                    transmitirATodos(marcador);
-                }else if (MsjSaliendo instanceof DTOMarcador){
-                    transmitirATodos(MsjSaliendo);
+                    //Regresar la accion 
+                    comunicarTodos(msjLast);
+                } else if (msjLast instanceof DTOLinea) {
+                    comunicarTodos(msjLast);
+                } else if (msjLast instanceof DTOCuadro) {
+                    comunicarTodos(msjLast);
+                    Object marcador = ssp.interpretarEntrada(MsjSockets.MARCADOR);
+                    comunicarTodos(marcador);
+                }else if (msjLast instanceof DTOMarcador){
+                    comunicarTodos(msjLast);
                 }
 
             } catch (IOException | ClassNotFoundException ex) {
@@ -106,13 +107,13 @@ public class HiloServer implements Runnable {
             }
         }
     }
-
+    //Aqui se obtienen los datos
     public DTOJugador getJugadorDTO() {
-        return jugadorDTO;
+        return DTOjugador;
     }
 
     public void setJugadorDTO(DTOJugador jugadorDTO) {
-        this.jugadorDTO = jugadorDTO;
+        this.DTOjugador = jugadorDTO;
     }
 
     public ObjectInputStream getInput() {
@@ -131,7 +132,7 @@ public class HiloServer implements Runnable {
         this.votado = votado;
     }
 
-    public synchronized void transmitirASiMismo(Object msj) {
+    public synchronized void comunicarPropio(Object msj) {
         try {
             this.output.writeObject(msj);
             this.output.flush();
@@ -139,8 +140,8 @@ public class HiloServer implements Runnable {
             Logger.getLogger(HiloServer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
-    public synchronized void transmitirATodos(Object mensaje) {
+    //Metodo para comunicar a todos los clientes.
+    public synchronized void comunicarTodos(Object mensaje) {
         for (HiloServer thread : threads) {
             try {
                 thread.output.writeObject(mensaje);

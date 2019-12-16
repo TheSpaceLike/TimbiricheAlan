@@ -8,10 +8,7 @@ package DominioDTO;
 import java.io.Serializable;
 import java.util.Objects;
 
-/**
- *
- * 
- */
+
 public class DTOJugador implements Serializable{
     private String nombreJugador;
     private String rutaAvatar;
@@ -74,6 +71,6 @@ public class DTOJugador implements Serializable{
 
     @Override
     public String toString() {
-        return "JugadorDTO{" + "nombreJugador=" + nombreJugador + ", rutaAvatar=" + rutaAvatar + ", puntaje=" + puntaje + '}';
+        return "DTOJugador{" + "nombreJugador=" + nombreJugador + ", rutaAvatar=" + rutaAvatar + ", puntaje=" + puntaje + '}';
     }
 }

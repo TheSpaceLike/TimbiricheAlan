@@ -11,6 +11,7 @@ import java.io.Serializable;
  *
  * 
  */
+//Aqui tendremos las variables las cuales son variables constantes..
 public enum MsjSockets implements Serializable {
-    VOTO, CREAR_SALA, EMPEZAR_PARTIDA, JUGADOR_NUEVO, TURNO_TERMINADO, MARCADOR
+    VOTO, CREARSALA, COMENZARPARTIDA, NUEVOJUGADOR, TURNOFINALIZADO, MARCADOR
 }

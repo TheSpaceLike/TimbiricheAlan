@@ -9,5 +9,5 @@ package presentacion.inicio;
  *
  */
 public interface IActualizable {
-    void actualizaDeSocket(Object mensaje);
+    void upDate(Object mensaje);
 }

@@ -15,10 +15,7 @@ import DominioDTO.MsjSockets;
 import java.io.IOException;
 import presentacion.inicio.IActualizable;
 
-/**
- *
- * 
- */
+
 public class Cliente implements ICliente {
 
     private static Cliente instance;
@@ -91,7 +88,7 @@ public class Cliente implements ICliente {
         try {
             SocketCliente.ListenServ();
         } catch (IOException | ClassNotFoundException ex) {
-            System.out.println("Hubo un problema al recibir respuesta del servidor");
+            System.out.println("No se hizo la machaca con el servidor.");
         }
     }
 

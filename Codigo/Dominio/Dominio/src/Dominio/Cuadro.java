@@ -5,7 +5,7 @@ package Dominio;
 
 /**
  *
- * @author 
+ * 
  */
 public class Cuadro extends FormaJuego {
 

@@ -34,35 +34,38 @@ public class ProtocoloInterprete {
            this.repo = new AccesoRepo();    
        }
 
-       public Object procesarEntrada(Object MsjEntrante) {
+       public Object interpretarEntrada(Object msjNuevo) {
 
+           //En esta parte es donde se realiza la conexion y el cliente (socketCliente) 
+           //manda la informacion del cliente por medio del hilo.
+           if (msjNuevo instanceof DTOJugador) {
+            return MsjSockets.NUEVOJUGADOR;
 
-           if (MsjEntrante instanceof DTOJugador) {
-            return MsjSockets.JUGADOR_NUEVO;
-
-           
-        } else if (MsjEntrante instanceof DTOLinea) {
-            DTOLinea lineaP = (DTOLinea) MsjEntrante;
+           //Cuando se reciban los objetos de transferencia de datos (DTOMovimiento)
+           //este lo mando al PAF para interpretar los datos y asignarlos y recibir una respuesta.
+        } else if (msjNuevo instanceof DTOLinea) {
+            DTOLinea lineaP = (DTOLinea) msjNuevo;
             ipaf.asignarLinea(lineaP);
-            DTOLinea oul = repo.getLastLine();
-            System.out.println(oul);
-            return oul;
+            DTOLinea xl = repo.getLastLine();
+            System.out.println(xl);
+            return xl;
 
             
-        } else if (MsjEntrante instanceof DTOCuadro) {
-            DTOCuadro cuadroP = (DTOCuadro) MsjEntrante;
+        } else if (msjNuevo instanceof DTOCuadro) {
+            DTOCuadro cuadroP = (DTOCuadro) msjNuevo;
             ipaf.asignarCuadro(cuadroP);
 
-            DTOCuadro ouc = repo.LastCuadro();
-            System.out.println(ouc);
-            return ouc;
+            DTOCuadro xc = repo.LastCuadro();
+            System.out.println(xc);
+            return xc;
 
-      
-        } else if (MsjEntrante == MsjSockets.VOTO) {
+            //Aqui si un cliente vota este voto se pasa a verificar 
+            //y posteriormente se notifica mendiante una respuesta.
+        } else if (msjNuevo == MsjSockets.VOTO) {
             return MsjSockets.VOTO;
-        } else if (MsjEntrante == MsjSockets.TURNO_TERMINADO) {
+        } else if (msjNuevo == MsjSockets.TURNOFINALIZADO) {
             return repo.obtenerTurnoSiguiente();
-        } else if (MsjEntrante == MsjSockets.MARCADOR){
+        } else if (msjNuevo == MsjSockets.MARCADOR){
             return repo.obtenerMarcador();
         }
 
